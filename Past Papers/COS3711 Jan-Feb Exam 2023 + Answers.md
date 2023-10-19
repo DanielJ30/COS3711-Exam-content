@@ -1,4 +1,4 @@
-# JanFeb 2023
+# January-February 2023
 
 ---
 **Disclaimer**:
