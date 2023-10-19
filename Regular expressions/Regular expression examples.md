@@ -9,7 +9,7 @@ The station code should meet the following requirements.
 
 `Note: when using QRegularExpression you need to escape your string literals like backslash. If you use a backslash in a string, then you have to escape it in the string with another backslash`
 
-```cpp
+```c++
 "^([A-Z]){1}[a-z]{2}\\1[1-9]{1}\\d{2}$"   OR   "^([A-Z]){1}[a-z]{2}\\1[1-9]{1}[0-9]{2}$"
 
 // The sections are grouped by parenthesis "()"
@@ -35,6 +35,39 @@ QRegularExpression re("^([A-Z]){1}[a-z]{2}\\1[1-9]{1}\\d{2}$");
 ^([A-Z]){1}[a-z]{2}\1[1-9]{1}\d{2}$
 ```
 
+# Oct-Nov 2022
+### Question 2.2
+It has been decided to use regular expressions to scan the file. Write the regular
+expression, in quotes, that can be used to check for the words “vegan chocolate” or
+“vegan chocolates” in the provided text file. You should not use the pipe symbol (|) and
+ensure that you use escape characters correctly. (4)
+
+`Note: when using QRegularExpression you need to escape your string literals like backslash. If you use a backslash in a string, then you have to escape it in the string with another backslash`
+
+```c++
+// \b - Defines the word boundary (Its where a word starts or ends)
+// ? - 0 or 1 instances of the selection in the group. If not in a group, then it relates to value before it.
+// * - 0 or more instances of the selection in the group. If not in a group, then it relates to value before it.
+// + - 1 or more instances of the selection in the group. If not in a group, then it relates to value before it.
+// (a|b) a or b - This wasn't used, but is useful to know (Its a logical OR)
+
+
+// When used with QRegularExpression
+QRegularExpression re("\\bvegan chocolate[s]?\\b");
+OR
+QRegularExpression re("\\bvegan chocolate(s)?\\b");
+OR
+QRegularExpression re("\\bvegan chocolates?\\b");
+
+
+// When just provided (not a QRegularExpression)
+\bvegan chocolate[s]?\b
+OR
+\bvegan chocolate(s)?\b
+OR
+\bvegan chocolates?\b
+```
+
 # Oct-Nov 2021
 ### Question 2.2
 Write the regular expression that can be used to check whether a string meets the following requirements:
@@ -45,7 +78,7 @@ Write the regular expression that can be used to check whether a string meets th
 
 `Note: when using QRegularExpression you need to escape your string literals like backslash. If you use a backslash in a string, then you have to escape it in the string with another backslash`
 
-```cpp
+```c++
 // ([GKW])([A-Z])([a-z\d]+)\1   OR  ([GKW])([A-Z])([a-z0-9]+)\1
 // The sections are grouped by parenthesis "()"
 // And are seen as:
