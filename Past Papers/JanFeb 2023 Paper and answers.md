@@ -302,6 +302,8 @@ Relationships:
 - `Client` has-a `Graph`
 - `RainDataContainer` has-many `RainData`
 
+![Rain_UML.PNG](..%2F..%2F..%2F..%2F..%2FDownloads%2FRain_UML.PNG)
+
 ### Question 1.2 (2 marks): Design Pattern
 
 I agree that a behavioral design pattern is appropriate here, specifically the Observer pattern. The Observer pattern would allow the `Client` class to observe changes in `RainDataContainer`. When new data is added to `RainDataContainer`, it notifies the `Client`, which then can update the graph.
