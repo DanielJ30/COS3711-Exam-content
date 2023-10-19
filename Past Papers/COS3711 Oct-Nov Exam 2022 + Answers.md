@@ -417,7 +417,6 @@ passed to the class should be added? (2)
 
 ChocolateList::ChocolateList()
 {
-
 }
 
 void ChocolateList::addChocolate(Chocolate* c)
@@ -429,10 +428,10 @@ void ChocolateList::addChocolate(Chocolate* c)
     if (className == "DarkChocolate") {
         darkChocolates.insert("dark", 1);           // Name, percentage chocolate
     }
-    else     if (className == "MilkChocolate") {
+    else if (className == "MilkChocolate") {
         milkChocolates.insert("milk", "no");        // Name, vegan status
     }
-    else     if (className == "WhiteChocolate") {
+    else if (className == "WhiteChocolate") {
         whiteChocolates.insert("white", "yes");     // Name, contains vanilla
     }
 
@@ -566,7 +565,7 @@ of the statements in the correct order.
 3. connect(tcpServer, &QTcpServer::newConnection, this,
    &Window::handleConnection);
 4. QByteArray data(tcpSocket->readAll());
-5. tcpServer->listen(QHostAddress::Any, 5555)
+5. tcpServer->listen(QHostAddress::Any, 5555);
 6. tcpSocket = tcpServer->nextPendingConnection(); (3)
 ```
 
