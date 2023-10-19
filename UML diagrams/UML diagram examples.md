@@ -82,7 +82,7 @@ Relationships:
 - `Client` uses `RainRecordXML`
 - `RainRecordXML` uses `RainRecord`
 
-![Rain_UML.PNG](..%2F..%2F..%2F..%2F..%2FDownloads%2FRain_UML.PNG)
+![Jan-Feb-2023 Diagram.PNG](..%2FResources%2FJan-Feb-2023%20Diagram.PNG)
 
 ---
 # Oct-Nov 2022
