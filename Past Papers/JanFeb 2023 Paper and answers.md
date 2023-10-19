@@ -1,9 +1,9 @@
-
 # JanFeb 2023
 
 ---
 **Disclaimer**:
-These resources are meant for learning purposes and comes with no guarantee of accuracy or correctness. Please do your own research and use it as a tool to double-check your own work, attempts and understanding.
+These resources are meant for learning purposes and comes with no guarantee of accuracy or correctness.
+Please do your own research and use it as a tool to double-check your own work, attempts and understanding.
 
 ---
 
@@ -26,6 +26,7 @@ the XML representation of all the rainfall data, and for passing this to the use
 graph.
 - Appropriate design patterns should be used as necessary.
 
+## Question 1
 ### Question 1.1:
 Considering the scenario given above, draw a partial UML class diagram that captures
 the scenario. You should include the necessary classes, class attributes, and class
@@ -43,33 +44,51 @@ behavioural pattern? (2 marks)
 
 ### Question 1.3:
 It was decided to provide the class that holds the rain data with some reflective
-functionality. That is, a getData() function should return a single data string that
+functionality. That is, a `getData()` function should return a single data string that
 contains all the data held by the class via the class’s meta-object, in a property named
 data. This function is used only by the meta-object and should not be available to users
 of the class.
 Write the class definition for this class showing how this would be set up. You are not
 required to include functionality or data members not mentioned above, or to code the
-implementation of the getData() function. (3 marks)
+implementation of the `getData()` function. (3 marks)
+---
+
+## Question 2
+Consider now the generation of the XML text that will be passed to the graphing applications.
+The format for the XML text to be generated is the following.
+
+```xml
+<rainRecord>
+    <rain date="2023/01/01">
+        <station>AagA100</station>
+        <mm>10</mm>
+    </rain>
+    <rain date="2023/01/02">
+        <station>BcdB123</station>
+        <mm>5</mm>
+    </rain>
+</rainRecord>
+```
 
 ### Question 2.1:
-If the date is stored as a QDate (say, QDate date), give the code you would use to
+If the date is stored as a `QDate` (say, `QDate date`), give the code you would use to
 convert this data into the string format that is used in the XML text above? (2 marks)
 
 ### Question 2.2:
-Suppose that a class named RainXml would be used to generate the XML text for all
+Suppose that a class named `RainXml` would be used to generate the XML text for all
 the rain data.
 
-```
+```c++
 class RainXml
 {
 public:
-RainXml();
-RainXml getInstance();
-QString writeToXml(/*passing rain data*/);
+    RainXml();
+    RainXml getInstance();
+    QString writeToXml(/*passing rain data*/);
 private:
-RainXml instance;
-bool checkStationCode(QString stn) const;
-QRegularExpression re;
+    RainXml instance;
+    bool checkStationCode(QString stn) const;
+    QRegularExpression re;
 };
 ```
 
@@ -86,69 +105,68 @@ Explain your reason clearly and persuasively; note that marks are only allocated
 reasoning. (2 marks)
 
 ### Question 2.3:
-The checkStationCode(QString stn) function from the class definition in 2.2 is
+The `checkStationCode(QString stn)` function from the class definition in 2.2 is
 used to ensure that the station code meets the correct format required, where the
-QString parameter is the station code that needs checking. The returned Boolean is
-true if the code meets requirements and false otherwise.
+`QString` parameter is the station code that needs checking. The returned Boolean is
+true if the code meets requirements and `false` otherwise.
 
-```
+```c++
 bool RainXml::checkStationCode(QString stn) const
-
 {
-// add code here
+    // add code here
 }
 ```
 
 The station code should meet the following requirements.
--Should begin with a capital letter.
--This is followed by any 2 lowercase alphabetic characters.
--This is followed by the same capital letter as the initial character of the code.
--The numeric part of the code is made up of any 3 digits, where the first digit cannot
-be zero.
--There should be no other characters before or after this code.
+- Should begin with a capital letter.
+- This is followed by any 2 lowercase alphabetic characters.
+- This is followed by the same capital letter as the initial character of the code.
+- The numeric part of the code is made up of any 3 digits, where the first digit cannot be zero.
+- There should be no other characters before or after this code.
 
 ### Question 2.3.1:
-Write the QRegularExpression that would be used to check codes for correctness.
-QRegularExpression re(/*what would you put here*/); (7 marks)
+Write the `QRegularExpression` that would be used to check codes for correctness.
+`QRegularExpression re(/*what would you put here*/);` (7 marks)
 
 ### Question 2.3.2:
 Which anti-pattern would be involved if the code were not checked for meeting
 requirements? (1 marks)
 
-### Question 2.3.3 Provide the code for the checkStationCode(QString stn) function assuming that
-QRegularExpression re, defined in 2.3.1, is a data member of the RainXml class. (2 marks)
+### Question 2.3.3 Provide the code for the `checkStationCode(QString stn)` function assuming that
+`QRegularExpression re`, defined in 2.3.1, is a data member of the `RainXml` class. (2 marks)
 
 ### Question 2.4:
 The following code stub is used to generate the XML text given above. Using the required
-XML format from the start of question 2, the data property from the meta-object from
-1.3, and the checkStationCode() function from 2.3, complete the code where
+XML format from the start of question 2, the `data` property from the meta-object from
+1.3, and the `checkStationCode()` function from 2.3, complete the code where
 indicated by comments.
 
 Assume that each item of rain data can be obtained from the meta-object property set
-up in 1.3 – it returns the data in the form: StationCode:yyyy/mm/dd:mm. For
+up in 1.3 – it returns the data in the form: `StationCode:yyyy/mm/dd:mm`. For
 example, if 10 mm of rain were received at station AagA100 on 1 January 2023, the data
-would be in the form AagA100:20230101:10.
+would be in the form `AagA100:20230101:10`.
 
-You are not required to provide the code for the writeToXml() function parameter or
+You are not required to provide the code for the `writeToXml()` function parameter or
 the main loop that loops through all the rain records. You may assume that for each pass
 through the loop, you have access to a pointer r that points to a rain record.
 
-```
+```c++
 QString RainXml::writeToXml(/*passing rain data*/)
 {
-QString xmlOutput;
-QXmlStreamWriter writer(&xmlOutput);
-// do initial setup of xml text
-// loop through each rain pointer named r (do not code this)
-{
-// use the meta-object to get the required data
-//if the station code passes the test
-{
-// set up the <rain> tag and its sub-tags as required
-}
-}
-// end xml text
-return xmlOutput;
+    QString xmlOutput;
+    QXmlStreamWriter writer(&xmlOutput);
+    // do initial setup of xml text
+    // loop through each rain pointer named r (do not code this)
+    {
+        // use the meta-object to get the required data
+        
+        //if the station code passes the test
+        {
+        // set up the <rain> tag and its sub-tags as required
+        }
+    }
+    // end xml text
+    return xmlOutput;
 }
 
 ```
@@ -158,65 +176,71 @@ return xmlOutput;
 The plan is to search the whole record of all rainfall data for a particular station’s data, and then
 present this data on the client screen. This search should be done in a thread.
 Consider the class implementation stub below (where stn is the station’s data that is required).
-```
+
+```c++
 StationThread::StationThread(/*all data*/, QString stn)
-: record{/*all data*/}, station{stn}
+    : record{/*all data*/}, station{stn}
 {}
+
 void StationThread::doSearch()
 {
-foreach(/*rain record in the data*/)
-{
-//get the station, date, and mm as strings
-if (/*this station in the data*/ == station)
-emit foundStation(/*date as string*/, /*mm as string*/);
-}
+    foreach(/*rain record in the data*/)
+    {
+        //get the station, date, and mm as strings
+        if (/*this station in the data*/ == station)
+            emit foundStation(/*date as string*/, /*mm as string*/);
+    }
 }
 ```
+---
 
+## Question 3
 ### Question 3.1:
-Write the class definition for the StationThread class, remembering that it should be run as a thread. (8 marks)
+Write the class definition for the `StationThread` class, remembering that it should be run as a thread. (8 marks)
 
 ### Question 3.2:
 Consider the code below that is run when data for a particular rain station is found by the
-code running in the thread, where QTableWidget *tableWidget and int row have
+code running in the thread, where `QTableWidget *tableWidget` and `int row` have
 already been declared and appropriately initialised.
 
-```
+```c++
 void Client::handleFound(QString date, QString mm)
 {
-QTableWidgetItem *dateItem{new QTableWidgetItem(date)};
-QTableWidgetItem *mmItem{new QTableWidgetItem(mm)};
-tableWidget->setItem(row, 0, dateItem);
-tableWidget->setItem(row++, 1, mmItem);
+    QTableWidgetItem *dateItem{new QTableWidgetItem(date)};
+    QTableWidgetItem *mmItem{new QTableWidgetItem(mm)};
+    tableWidget->setItem(row, 0, dateItem);
+    tableWidget->setItem(row++, 1, mmItem);
 }
 ```
 
-Assume the following code in Client.
-```
+Assume the following code in `Client`.
+
+```c++
 QThread *t{new QThread};
 StationThread *st{new StationThread(/*passing parameters*/)};
 ```
 
-Write the code that would follow these declarations to get the thread running with the StationThread object, ensuring that the data is received from the running thread and passed on to the handleFound() function. (6 marks)
+Write the code that would follow these declarations to get the thread running with the `StationThread` object, 
+ensuring that the data is received from the running thread and passed on to the `handleFound()` function. (6 marks)
 
 ### Question 3.3:
-Would you agree that the QTableWidget used in 3.2 is the best approach that can be
+Would you agree that the `QTableWidget` used in 3.2 is the best approach that can be
 used for displaying a station’s rainfall data on the client window? Give reasons for your
 answer. Note that marks are only allocated to your reasoning. (2 marks)
 
 ### Question 3.4:
 As a way of managing a backup/restore functionality, it has been decided to subclass
-the QTableWidget class to implement a classic memento design pattern. The start of
+the `QTableWidget` class to implement a classic memento design pattern. The start of
 the class definition is provided below.
 
-```
+```c++
 class MyTableWidget: public QTableWidget
 {
 private:
-friend class MyTableWidgetMemento;
-MyTableWidget();
-MyTableWidgetMemento* createMemento();
-void setMemento(MyTableWidgetMemento *m);
+    friend class MyTableWidgetMemento;
+    MyTableWidget();
+    MyTableWidgetMemento* createMemento();
+    void setMemento(MyTableWidgetMemento *m);
 };
 ```
 
