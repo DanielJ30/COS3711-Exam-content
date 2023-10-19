@@ -16,14 +16,14 @@ The station code should meet the following requirements.
 // And are seen as:
 //  Group 1 - ([A-Z])
 
-// {1}  - means that there should be 1 instance of the defined group
-// {2}  - means that there should be 2 instances of the defined group
-// {n}  - means that there should be n instance(n) of the defined group (replace n with an integer)
-// \d   - means digit (0-9)
+// {1}  - Means that there should be 1 instance of the defined group
+// {2}  - Means that there should be 2 instances of the defined group
+// {n}  - Means that there should be n instance(n) of the defined group (replace n with an integer)
+// \d   - Means digit (0-9)
 // ^    - Start of string, or start of line in multilinepattern
 // $    - End of string, or end of line in multi-line pattern
-// [A-Z] - defines a selection from the uppercase letter A until the uppercase letter Z
-// [a-z] - defines a selection from the lowercase letter a until the lowercase letter z
+// [A-Z] - Defines a selection from the uppercase letter A until the uppercase letter Z
+// [a-z] - Defines a selection from the lowercase letter a until the lowercase letter z
 // The trailing \1 means that it should repeat Group 1
 // If you put a trailing \2 then you want it to repeat Group 2
 // If you put a trailing \3 then you want it to repeat Group 3 etc.
@@ -110,13 +110,13 @@ Provide the code (based on that provided above) that uses a QRegExpValidator to 
 // [1][0-9]{2}(f|m)?[A-Z]{1}[a-zA-Z]{2,}  OR  [1]\d{2}(f|m)?[A-Z]{1}[a-zA-Z]{2,}
 
 // [1]      - Expect the digit 1 
-// [0-9]    - defines a selection from the digits 0 through 0 (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+// [0-9]    - Defines a selection from the digits 0 through 0 (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
 // {2}      - Expecting 2 occurrences
 // (f|m)    - Either f or m
 // ?        - 0 or 1 instances of the selection in the group. If not in a group, then it relates to value before it.
-// [A-Z]    - defines a selection from the uppercase letter A until the uppercase letter Z
+// [A-Z]    - Defines a selection from the uppercase letter A until the uppercase letter Z
 // {1}      - Expecting 1 occurrence
-// [a-zA-Z] - defines a selection from the lowercase a and uppercase letter A until the lowercase Z and uppercase letter Z
+// [a-zA-Z] - Defines a selection from the lowercase a and uppercase letter A until the lowercase Z and uppercase letter Z
 // {2,}     - Matches the previous token between 2 and unlimited times, as many times as possible, giving back as needed (greedy)
 
 // When used with QRegularExpression
@@ -128,4 +128,36 @@ QRegularExpression re("[1]\\d{2}(f|m)?[A-Z]{1}[a-zA-Z]{2,}");
 [1][0-9]{2}(f|m)?[A-Z]{1}[a-zA-Z]{2,}
 OR
 [1]\d{2}(f|m)?[A-Z]{1}[a-zA-Z]{2,}
+```
+
+# Jun-July 2021
+### Question 4.1.b
+An optional property may be added to a vaccine instance indicating the authorisation code of the user who added it. 
+- The code should be made up of three to five uppercase alphabetic characters followed by a hyphen and then 3 digits.
+- An optional final character may be included.
+
+`Note: when using QRegularExpression you need to escape your string literals like backslash. If you use a backslash in a string, then you have to escape it in the string with another backslash`
+
+```c++
+// [A-Z]{3,5}-[0-9]{3}.?  OR  [A-Z]{3,5}-[0-9]{3}[A-Za-z]?
+
+// [A-Z]    - Defines a selection from the uppercase letter A until the uppercase letter Z
+// {3,5}    - Expecting 3 to 5 occurrences
+// -        - Literal character "-"
+// [0-9]    - Defines a selection from the digits 0 through 0 (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+// {3}      - Expecting 3 occurrences
+// .        - The dot is a wildcard character
+// ?        - 0 or 1 instances of the selection in the group. If not in a group, then it relates to value before it.
+
+// [A-Za-z] - Defines a selection from the lowercase a and uppercase letter A until the lowercase Z and uppercase letter Z
+
+// When used with QRegularExpression
+QRegularExpression re("[A-Z]{3,5}-[0-9]{3}.?");
+OR
+QRegularExpression re("[A-Z]{3,5}-[0-9]{3}[A-Za-z]?");
+
+// When just provided (not a QRegularExpression)
+[A-Z]{3,5}-[0-9]{3}.?
+OR
+[A-Z]{3,5}-[0-9]{3}[A-Za-z]?
 ```
