@@ -96,3 +96,36 @@ QRegularExpression re("([GMK])([A-Z](a-z0-9)+)\\1");
 // When just provided (not a QRegularExpression)
 ([GMK])([A-Z](a-z0-9)+)\1
 ```
+
+# Oct-Nov 2020
+### Question 1.2.2
+Provide the code (based on that provided above) that uses a QRegExpValidator to force a user to enter a patient number in exactly the following format:
+- First 3 digits: number between 100 and 199.
+- Optional gender character (using an f or an m).
+- 3 or more alphabetic characters, where at least the first character is a capital letter. (11)
+
+`Note: when using QRegularExpression you need to escape your string literals like backslash. If you use a backslash in a string, then you have to escape it in the string with another backslash`
+
+```c++
+// [1][0-9]{2}(f|m)?[A-Z]{1}[a-zA-Z]{2,}  OR  [1]\d{2}(f|m)?[A-Z]{1}[a-zA-Z]{2,}
+
+// [1]      - Expect the digit 1 
+// [0-9]    - defines a selection from the digits 0 through 0 (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+// {2}      - Expecting 2 occurrences
+// (f|m)    - Either f or m
+// ?        - 0 or 1 instances of the selection in the group. If not in a group, then it relates to value before it.
+// [A-Z]    - defines a selection from the uppercase letter A until the uppercase letter Z
+// {1}      - Expecting 1 occurrence
+// [a-zA-Z] - defines a selection from the lowercase a and uppercase letter A until the lowercase Z and uppercase letter Z
+// {2,}     - Matches the previous token between 2 and unlimited times, as many times as possible, giving back as needed (greedy)
+
+// When used with QRegularExpression
+QRegularExpression re("[1][0-9]{2}(f|m)?[A-Z]{1}[a-zA-Z]{2,}");
+OR
+QRegularExpression re("[1]\\d{2}(f|m)?[A-Z]{1}[a-zA-Z]{2,}");
+
+// When just provided (not a QRegularExpression)
+[1][0-9]{2}(f|m)?[A-Z]{1}[a-zA-Z]{2,}
+OR
+[1]\d{2}(f|m)?[A-Z]{1}[a-zA-Z]{2,}
+```
