@@ -37,10 +37,57 @@ application. You should include the Client/GUI class.
 [You may use a software tool to create the UML class diagram. Use underlining to
 represent italics in hand-drawn UML class diagrams.] (20 marks)
 
+#### 1.1 - Answer
+```
+1. Rain (Aggragation with RainRecord ---<>)
+    - station: QString
+    - date: QDate
+    - mm: int
+    + Rain():
+
+2. RainRecord (Aggragation with Client ---<>)
+    - rainRecord: QList<Rain>
+    + RainRecord()
+
+3. Graph (Base - Abstract, Aggragation with Client ---<>) 
+    # xmlString: QString
+    + Graph(QString xmlData)
+    + Graph()
+    + graphData(): void
+    
+4. Bar (Inherits - Graph ---|>) 
+    + Bar(QString xmlData)
+    + graphData(): void
+    
+5. Column (Inherits - Graph ---|>) 
+    + Column(QString xmlData)
+    + graphData(): void
+    
+6. RainRecordXML (Aggragation with RainRecord ---<>, Association with RainRecord ---> )
+    + writeToXML(RainRecord rainRecord): QString
+    
+7. Client (Uses RainRecordXML, Creates x2 (Bar/Column))
+    - rainList: RainList*
+    - graph: Graph
+    + Client()
+```
+
+![Jan-Feb-2023 Diagram.PNG](..%2FResources%2FJan-Feb-2023%20Diagram.PNG)
+
 ### Question 1.2:
 It has been argued that the design pattern that would be used here is a behavioural
 pattern. Do you agree, indicating which pattern would be used and why it is or is not a
 behavioural pattern? (2 marks)
+
+#### 1.2 - Answer:
+
+```text
+I agree that a behavioral design pattern is appropriate here.
+It makes use of the strategy pattern to carry out its functionality by allowing the `Client` to create `Bar`/`Column` graphs.
+
+Why the strategy pattern:
+- Strategy is a behavioural design pattern that lets you define a family of algorithms, put each of them into a separate class, and make their object interchangable.
+```
 
 ### Question 1.3:
 It was decided to provide the class that holds the rain data with some reflective
@@ -52,6 +99,18 @@ Write the class definition for this class showing how this would be set up. You 
 required to include functionality or data members not mentioned above, or to code the
 implementation of the `getData()` function. (3 marks)
 ---
+
+#### 1.3 - Answer
+```c++
+class Rain: public QObject
+{
+    Q_OBJECT
+    Q_PROPERTY(QString data READ getData CONSTANT)
+    
+private:
+    QString getData();
+}
+```
 
 ## Question 2
 Consider now the generation of the XML text that will be passed to the graphing applications.
@@ -73,6 +132,11 @@ The format for the XML text to be generated is the following.
 ### Question 2.1:
 If the date is stored as a `QDate` (say, `QDate date`), give the code you would use to
 convert this data into the string format that is used in the XML text above? (2 marks)
+
+#### 2.1 - Answer
+```c++
+date.toString("yyyy/MM/dd");
+```
 
 ### Question 2.2:
 Suppose that a class named `RainXml` would be used to generate the XML text for all
@@ -99,10 +163,33 @@ The class definition code provided above does not correctly implement the classi
 singleton design pattern. Correct it so that it does. You are not expected to indicate the
 container that is used to pass rain data. (3 marks)
 
+#### 2.2.1 - Answer:
+```c++
+class RainXML
+{
+public: 
+    static RainXML* getInstance(); // Must be a static pointer
+    QString writeToXML(/*passing rain data*/);
+    
+private:
+    RainXML(); // Constructor must be private in singleton class
+    static RainXML* instance; // Must be a static pointer of the RainXML class
+    bool checkStationCode(QString stn) const;
+    QRegularExpression re;
+}
+```
+
 ### Question 2.2.2:
 Would you agree with the decision to make this class use the singleton design pattern?
 Explain your reason clearly and persuasively; note that marks are only allocated for the
 reasoning. (2 marks)
+
+#### 2.2.2 - Answer
+```text
+Yes as it prevents having multiple instances of the RainXML class.
+This prevents possible bad writes to xml data as it might not handle multiple concurrent streams of xml data correctly. 
+Having a single instance of the RainXML class prevents multiple concurrent sources from writing to xml.
+```
 
 ### Question 2.3:
 The `checkStationCode(QString stn)` function from the class definition in 2.2 is
@@ -128,12 +215,50 @@ The station code should meet the following requirements.
 Write the `QRegularExpression` that would be used to check codes for correctness.
 `QRegularExpression re(/*what would you put here*/);` (7 marks)
 
+#### 2.3.1 - Answer
+```c++
+QRegularExpression re("^([A-Z]){1}[a-z]{2}\\1[1-9]{1}[0-9]{2}$");
+
+or
+
+QRegularExpression re("^([A-Z]){1}[a-z]{2}\\1[1-9]{1}\\d{2}$");
+```
+
 ### Question 2.3.2:
 Which anti-pattern would be involved if the code were not checked for meeting
 requirements? (1 marks)
 
+#### 2.3.2 - Answer
+```text
+Input Kludge
+```
+
 ### Question 2.3.3 Provide the code for the `checkStationCode(QString stn)` function assuming that
 `QRegularExpression re`, defined in 2.3.1, is a data member of the `RainXml` class. (2 marks)
+
+#### 2.3.3 - Answer
+```c++
+bool RainXML::checkStationCode(QString stn)
+{
+    return re.match(stn).hasMatch();
+}
+
+
+or
+
+
+bool RainXML::checkStationCode(QString stn)
+{
+    if(re.match(stn).hasMatch())
+    {
+        return true;
+    } 
+    else
+    {
+        return false;
+    }
+}
+```
 
 ### Question 2.4:
 The following code stub is used to generate the XML text given above. Using the required
@@ -172,6 +297,52 @@ QString RainXml::writeToXml(/*passing rain data*/)
 ```
  (13 marks)
 
+```c++
+QString RainXml::writeToXml(/*passing rain data*/)
+{
+    QString xmlOutput;
+    QXmlStreamWriter xmlStreamWriter(&xmlOutput);
+    // do initial setup of xml text
+    
+    xmlStreamWriter.writeStartDocument();   // Create the start of the document
+    xmlStreamWriter.writeStartElement("rainRecord");    // Write the first element of the document
+    
+    // loop through each rain pointer named r (do not code this)
+    {
+        // use the meta-object to get the required data
+        const QMetaObject *metaObject = r->metaObject();    // Get the metaObject for the provided raiun pointer named r
+        QString metaObjectData = (metaObject->property(metaObject->indexOfProperty("data"))).read(r).toString(); // Get the data of the property
+        
+        QStringList list(metaObjectData().split(":"));  // Split on the colon and "AagA100:20230101:10" becomes ["AagA100", "20230101", "10"]
+           
+        
+        //if the station code passes the test
+        if(checkStationCode(list.at(0))) // Checks if the first element in the list is valid
+        {
+            xmlStreamWriter.writeStartElement("rain"); // Write the start of the rain element to the document
+            
+            QXMLStreamAttribute dateAttribute("date", list.at(1));
+            xmlStreamWriter.writeAttribute(dateAttribute); // Write the date attribute to the document
+            
+            xmlStreamWriter.writeTextElement("station", list.at(0)); // Write the station element to the document
+            
+            xmlStreamWriter.writeTextElement("mm", list.at(2)); // Write the mm element to the documen
+            
+            xmlStreamWriter.writeEndElement(); // Write the end of the rain element to the document
+
+        // set up the <rain> tag and its sub-tags as required
+        }
+        
+        xmlStreamWriter.writeEndElement(); // Write the end of the rainRecord element to the document
+        
+        xmlStreamWriter.writeEndDocument(); // End the document
+    }
+    // end xml text
+    return xmlOutput;
+}
+```
+
+## Question 3
 
 The plan is to search the whole record of all rainfall data for a particular station’s data, and then
 present this data on the client screen. This search should be done in a thread.
@@ -194,9 +365,29 @@ void StationThread::doSearch()
 ```
 ---
 
-## Question 3
+
 ### Question 3.1:
 Write the class definition for the `StationThread` class, remembering that it should be run as a thread. (8 marks)
+
+#### 3.1 - Answer
+```c++
+class StationThread : QObject // Must inherit from QObject to use thread functionality
+{
+    Q_OBJECT // Must make use of Q_OBJECT to use thread functionality
+public:
+    StationThread(/*all data*/, QString stn);
+    
+public slots:
+    doSearch();
+    
+signals:
+    foundStation(QString date, QString mm);
+    
+private:
+    /*all data*/ record;
+    QString station;
+}
+```
 
 ### Question 3.2:
 Consider the code below that is run when data for a particular rain station is found by the
@@ -223,10 +414,31 @@ StationThread *st{new StationThread(/*passing parameters*/)};
 Write the code that would follow these declarations to get the thread running with the `StationThread` object, 
 ensuring that the data is received from the running thread and passed on to the `handleFound()` function. (6 marks)
 
+#### 3.2 - Answer:
+```c++
+    Client *c{new Client}; // Create an instance of the client or assume that there is an instance of the client
+    
+    st.moveToThread(t); // Moves the st StationThread to the t QThread
+    
+    connect(t, SIGNAL(started()), st, SLOT(doSearch())); // Assign the thread started to the StationThread doSearch() 
+                                                         // slot so that once the thread is started, it will call the doSearch() method
+                                                         
+    connect(st, SIGNAL(foundStation()), c, SLOT(handlefound())); // Assign the StationThread foundStation to the client handleFound() slot 
+                                                                 // so that once the StationThread has found a station, it will call the handleFound() method of the client
+    
+```
+
 ### Question 3.3:
 Would you agree that the `QTableWidget` used in 3.2 is the best approach that can be
 used for displaying a station’s rainfall data on the client window? Give reasons for your
 answer. Note that marks are only allocated to your reasoning. (2 marks)
+
+#### 3.3 - Answer
+```text
+Yes, as it provides an appropriate way to view the data and uses the existing Model/View architecture to manage the 
+relationships between data and how it would be presented/shown to the user.
+```
+
 
 ### Question 3.4:
 As a way of managing a backup/restore functionality, it has been decided to subclass
@@ -248,358 +460,39 @@ private:
 What components usually make up the classic memento pattern, and which classes in
 this scenario would represent those components? (3 marks)
 
+#### 3.4.1 - Answer
+```text
+CareTaker - MyTableWidget
+Originator - MyTableWidgetMemento (According to the provided MyTableWidget class as it is declared as the friend of the MyTableWidget class)
+Memento - MyTableWidgetMemento
+```
+
 ### Question 3.4.2:
 Explain why this implementation of the classic memento patten is correct or not. Marks
 are only awarded for the explanation. (2 marks)
+
+#### 3.4.2 - Answer:
+```text
+The friend declaration is incorrect as it declares the MyTableWidgetMemento as the friend instead of a 
+different entity, as the MyTableWidgetMemento is already declared as the memento itself.
+```
 
 ### Question 3.5:
 It has been argued that cloud computing is the best way to go when it comes to managing
 all the rainfall data. Explain why this would be so in terms of cost and scale. (4 marks)
 
----
----
+#### 3.5 - Answer:
+```text
+Cost:
+- It is cheaper to host in the cloud as you are able to make use of more powerful hardware at a lower cost.
+- If you were to make use of the same hardware yourself on a local site, you would be paying far more for it as compared to cloud computing.
 
-## Attempt:
-
-
-### Question 1.1 (20 marks): UML Class Diagram
-
-Given that we cannot generate images here, let's use a tree view to represent the UML class diagram.
-
+Scale:
+- In cloud computing it is easy to scale resources depending on your needs.
+- If you need more resources due to growth or less due to certain circumstances, it is very easy and flexible to 
+  increase/decrease the resources you would use while in the cloud, whereas if you were do try to scale on a local site, you 
+  would need to have larger facilities to store/manage your newly acquired hardware or would need to 
+  try to sell the used hardware in the event of a downscale.
 ```
-1. RainData
-    - station: QString
-    - date: QDate
-    - amount: double
-    + getStation(): QString
-    + getDate(): QDate
-    + getAmount(): double
-    + setData(QString, QDate, double): void
-    + getData(): QString (meta-object only)
-
-2. RainDataContainer
-    - dataList: QList<RainData>
-    + addData(RainData): void
-    + getDataList(): QList<RainData>
-    + toXml(): QString
-
-3. Graph
-    - type: QString ("Bar" or "Column")
-    + setType(QString): void
-    + getType(): QString
-    + render(QString): void
-
-4. Client
-    - rainDataContainer: RainDataContainer
-    - graph: Graph
-    + addRainData(RainData): void
-    + setGraphType(QString): void
-    + displayGraph(): void
-```
-
-Relationships:
-- `Client` has-a `RainDataContainer`
-- `Client` has-a `Graph`
-- `RainDataContainer` has-many `RainData`
-
-![Jan-Feb-2023 Diagram.PNG](..%2FResources%2FJan-Feb-2023%20Diagram.PNG)
-
-### Question 1.2 (2 marks): Design Pattern
-
-I agree that a behavioral design pattern is appropriate here, specifically the Observer pattern. The Observer pattern would allow the `Client` class to observe changes in `RainDataContainer`. When new data is added to `RainDataContainer`, it notifies the `Client`, which then can update the graph.
-
-Why it's a behavioral pattern:
-- The Observer pattern is considered a behavioral pattern because it's used to define a one-to-many dependency between objects so that when one object changes state, all its dependents are notified and updated automatically.
-
-### Question 1.3 (3 marks): Class Definition for RainData
-
-Here is the class definition for the `RainData` class that holds the rain data and includes the reflective functionality.
-
-```cpp
-#include <QString>
-#include <QDate>
-
-class RainData {
-private:
-    QString station;
-    QDate date;
-    double amount;
-
-public:
-    void setData(const QString& stn, const QDate& dt, double amt) {
-        station = stn;
-        date = dt;
-        amount = amt;
-    }
-
-    QString getStation() const { return station; }
-    QDate getDate() const { return date; }
-    double getAmount() const { return amount; }
-
-private:
-    Q_PROPERTY(QString data READ getData)
-    QString getData() const {
-        // This function is used only by the meta-object
-        return QString("%1:%2:%3").arg(station).arg(date.toString("yyyy/MM/dd")).arg(amount);
-    }
-};
-```
-
-I've used the `Q_PROPERTY` macro to define a read-only property named `data`, which will invoke the `getData()` function to get its value. This function is intended to be used only by the meta-object and is not public.
-
-### Question 1.1 (20 marks): UML Class Diagram
-
-```
-1. RainData
-    - station: QString
-    - date: QDate
-    - amount: double
-    + getStation(): QString
-    + getDate(): QDate
-    + getAmount(): double
-    + setData(QString, QDate, double): void
-    + getData(): QString (meta-object only)
-
-2. RainDataContainer
-    - dataList: QList<RainData>
-    + addData(RainData): void
-    + getDataList(): QList<RainData>
-    + toXml(): QString
-
-3. Graph
-    - type: QString ("Bar" or "Column")
-    + setType(QString): void
-    + getType(): QString
-    + render(QString): void
-
-4. Client
-    - rainDataContainer: RainDataContainer
-    - graph: Graph
-    + addRainData(RainData): void
-    + setGraphType(QString): void
-    + displayGraph(): void
-```
-
-Relationships:
-- `Client` has-a `RainDataContainer`
-- `Client` has-a `Graph`
-- `RainDataContainer` has-many `RainData`
-
-### Question 1.2 (2 marks): Design Pattern
-
-I agree that a behavioral design pattern is appropriate here, specifically the Observer pattern. The Observer pattern would allow the `Client` class to observe changes in `RainDataContainer`. When new data is added to `RainDataContainer`, it notifies the `Client`, which then can update the graph.
-
-Why it's a behavioral pattern:
-- The Observer pattern is considered a behavioral pattern because it's used to define a one-to-many dependency between objects so that when one object changes state, all its dependents are notified and updated automatically.
-
-### Question 1.3 (3 marks): Class Definition for RainData
-
-Here is the class definition for the `RainData` class that holds the rain data and includes the reflective functionality.
-
-```cpp
-#include <QString>
-#include <QDate>
-
-class RainData {
-private:
-    QString station;
-    QDate date;
-    double amount;
-
-public:
-    void setData(const QString& stn, const QDate& dt, double amt) {
-        station = stn;
-        date = dt;
-        amount = amt;
-    }
-
-    QString getStation() const { return station; }
-    QDate getDate() const { return date; }
-    double getAmount() const { return amount; }
-
-private:
-    Q_PROPERTY(QString data READ getData)
-    QString getData() const {
-        // This function is used only by the meta-object
-        return QString("%1:%2:%3").arg(station).arg(date.toString("yyyy/MM/dd")).arg(amount);
-    }
-};
-```
-
-I've used the `Q_PROPERTY` macro to define a read-only property named `data`, which will invoke the `getData()` function to get its value. This function is intended to be used only by the meta-object and is not public.
-
----
-
-### Question 2.1 (2 marks): Converting QDate to String for XML
-
-To convert a `QDate` object to a string format suitable for XML, you can use the `toString` method provided by the `QDate` class.
-
-```cpp
-QDate date;  // Assume this is initialized
-QString dateString = date.toString("yyyy-MM-dd");  // Converts to a string in the format "YYYY-MM-DD"
-```
-
-### Question 2.2.1 (3 marks): Singleton Pattern for RainXml
-
-The class definition provided does not correctly implement the Singleton pattern. Here is how it can be corrected.
-
-```cpp
-class RainXml {
-private:
-    static RainXml* instance;
-    QRegularExpression re;
-
-    RainXml() {}  // Private constructor
-
-public:
-    static RainXml* getInstance() {
-        if (!instance) {
-            instance = new RainXml();
-        }
-        return instance;
-    }
-
-    QString writeToXml(/*passing rain data*/);
-    bool checkStationCode(QString stn) const;
-};
-
-// Initialize static member
-RainXml* RainXml::instance = nullptr;
-```
-
-### Question 2.2.2 (2 marks): Singleton Decision
-
-I agree with the decision to make the `RainXml` class a Singleton. This is because generating XML for rain data is a centralized operation that doesn't require multiple instances of the `RainXml` class. A single instance can manage the XML representation efficiently, ensuring that there is a single point of control.
-
-### Question 2.3.1 (7 marks): QRegularExpression for Station Code
-
-The QRegularExpression to check if the station code meets the given criteria would be as follows:
-
-```cpp
-QRegularExpression re("^[A-Z][a-z]{2}[A-Z][1-9][0-9]{2}$");
-```
-
-### Question 2.3.2 (1 mark): Anti-Pattern
-
-If the station code were not checked for meeting requirements, it would be an example of the "Lack of Validation" anti-pattern, which can lead to various issues such as incorrect data processing and potential security vulnerabilities.
-
-### Question 2.3.3 (2 marks): checkStationCode Function
-
-Here is how the `checkStationCode` function could be implemented:
-
-```cpp
-bool RainXml::checkStationCode(QString stn) const {
-    return re.match(stn).hasMatch();
-}
-```
-
-### Question 2.4 (13 marks): writeToXml Function
-
-Here is a stub for the `writeToXml` function, incorporating the required functionality:
-
-```cpp
-QString RainXml::writeToXml(/*passing rain data*/)
-{
-    QString xmlOutput;
-    QXmlStreamWriter writer(&xmlOutput);
-    writer.writeStartDocument();
-    writer.writeStartElement("rainData");
-
-    // Loop through each rain pointer named r (not coding this loop)
-    {
-        // Use the meta-object to get the required data
-        QString data = r->getData();  // Assume r is a pointer to a RainData object
-
-        // If the station code passes the test
-        if (checkStationCode(data.split(":")[0])) {
-            writer.writeStartElement("rain");
-
-            writer.writeTextElement("station", data.split(":")[0]);
-            writer.writeTextElement("date", data.split(":")[1]);
-            writer.writeTextElement("amount", data.split(":")[2]);
-
-            writer.writeEndElement();  // End of "rain"
-        }
-    }
-
-    writer.writeEndElement();  // End of "rainData"
-    writer.writeEndDocument();
-
-    return xmlOutput;
-}
-```
-
----
-
-### Question 3.1 (8 marks): StationThread Class Definition
-
-To run the `StationThread` class as a thread in Qt, you can subclass `QRunnable` or `QThread`. Here, I'll use `QThread` for demonstration.
-
-```cpp
-#include <QThread>
-#include <QString>
-#include <QList>
-
-class StationThread : public QThread
-{
-    Q_OBJECT
-private:
-    QList<RainData> record;  // Assume RainData is the class that holds individual rain records
-    QString station;
-
-public:
-    StationThread(const QList<RainData>& allData, const QString& stn)
-        : record(allData), station(stn) {}
-
-    void run() override {
-        doSearch();
-    }
-
-    void doSearch();
-
-signals:
-    void foundStation(QString date, QString mm);
-};
-```
-
-### Question 3.2 (6 marks): Thread Execution and Signal Handling
-
-The following code will set up the thread and connect its signals.
-
-```cpp
-QThread* t = new QThread;
-StationThread* st = new StationThread(/*passing parameters*/);
-
-st->moveToThread(t);
-
-connect(st, &StationThread::foundStation, &Client::handleFound);
-connect(t, &QThread::started, st);
-connect(t, &QThread::finished, t, &QThread::deleteLater);
-
-t->start();
-```
-
-### Question 3.3 (2 marks): QTableWidget Decision
-
-Yes, I agree that using `QTableWidget` is a suitable approach for displaying the station's rainfall data. It's a high-level API that provides built-in functionality for item selection, sorting, and other common requirements, which saves development time. Also, it allows easy mapping of data to rows and columns, which is quite intuitive for the user.
-
-### Question 3.4.1 (3 marks): Classic Memento Pattern Components
-
-The classic memento pattern usually consists of three main components: 
-- Originator: The object whose state needs to be saved and restored. (`MyTableWidget` in this case)
-- Memento: The object that actually stores the state of the Originator. (`MyTableWidgetMemento`)
-- Caretaker: The object that keeps track of multiple memento. (Could be a `BackupManager` class or the `Client` class in this scenario)
-
-### Question 3.4.2 (2 marks): Memento Pattern Implementation
-
-The implementation appears to be on the right track for applying the Memento pattern. The `MyTableWidget` class (the Originator) has methods to create and set a memento (`MyTableWidgetMemento`). However, without seeing the implementation of these methods and the `MyTableWidgetMemento` class, it's hard to definitively say if the pattern is correctly implemented.
-
-### Question 3.5 (4 marks): Cloud Computing for Rainfall Data Management
-
-Utilizing cloud computing for managing all the rainfall data would be advantageous in terms of both cost and scale:
-
-- **Cost-Efficiency**: Cloud services often operate on a pay-as-you-go model, meaning you only pay for the storage and computational power you actually use. This eliminates the upfront cost of setting up and maintaining physical servers.
-  
-- **Scalability**: Cloud platforms can easily adapt to changing needs. If more storage or computational power is needed, it can be added instantly without the need to purchase and set up additional physical hardware.
 
 ---
