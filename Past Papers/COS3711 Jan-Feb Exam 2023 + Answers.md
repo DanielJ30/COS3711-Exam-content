@@ -372,7 +372,7 @@ Write the class definition for the `StationThread` class, remembering that it sh
 
 #### 3.1 - Answer
 ```c++
-class StationThread : QObject // Must inherit from QObject to use thread functionality
+class StationThread : public QObject // Must inherit from QObject to use thread functionality
 {
     Q_OBJECT // Must make use of Q_OBJECT to use thread functionality
 public:

@@ -1,3 +1,105 @@
+# January-February 2023
+## Question 2
+Consider now the generation of the XML text that will be passed to the graphing applications.
+The format for the XML text to be generated is the following.
+
+```xml
+<rainRecord>
+    <rain date="2023/01/01">
+        <station>AagA100</station>
+        <mm>10</mm>
+    </rain>
+    <rain date="2023/01/02">
+        <station>BcdB123</station>
+        <mm>5</mm>
+    </rain>
+</rainRecord>
+```
+
+### Question 2.4:
+The following code stub is used to generate the XML text given above. Using the required
+XML format from the start of question 2, the `data` property from the meta-object from
+1.3, and the `checkStationCode()` function from 2.3, complete the code where
+indicated by comments.
+
+Assume that each item of rain data can be obtained from the meta-object property set
+up in 1.3 – it returns the data in the form: `StationCode:yyyy/mm/dd:mm`. For
+example, if 10 mm of rain were received at station AagA100 on 1 January 2023, the data
+would be in the form `AagA100:20230101:10`.
+
+You are not required to provide the code for the `writeToXml()` function parameter or
+the main loop that loops through all the rain records. You may assume that for each pass
+through the loop, you have access to a pointer r that points to a rain record.
+
+```c++
+QString RainXml::writeToXml(/*passing rain data*/)
+{
+    QString xmlOutput;
+    QXmlStreamWriter writer(&xmlOutput);
+    // do initial setup of xml text
+    // loop through each rain pointer named r (do not code this)
+    {
+        // use the meta-object to get the required data
+        
+        //if the station code passes the test
+        {
+        // set up the <rain> tag and its sub-tags as required
+        }
+    }
+    // end xml text
+    return xmlOutput;
+}
+
+```
+(13 marks)
+
+#### 2.4 - Answer:
+```c++
+QString RainXml::writeToXml(/*passing rain data*/)
+{
+    QString xmlOutput;
+    QXmlStreamWriter xmlStreamWriter(&xmlOutput);
+    // do initial setup of xml text
+    
+    xmlStreamWriter.writeStartDocument();   // Create the start of the document
+    xmlStreamWriter.writeStartElement("rainRecord");    // Write the first element of the document
+    
+    // loop through each rain pointer named r (do not code this)
+    {
+        // use the meta-object to get the required data
+        const QMetaObject *metaObject = r->metaObject();    // Get the metaObject for the provided raiun pointer named r
+        QString metaObjectData = (metaObject->property(metaObject->indexOfProperty("data"))).read(r).toString(); // Get the data of the property
+        
+        QStringList list(metaObjectData().split(":"));  // Split on the colon and "AagA100:20230101:10" becomes ["AagA100", "20230101", "10"]
+           
+        
+        //if the station code passes the test
+        if(checkStationCode(list.at(0))) // Checks if the first element in the list is valid
+        {
+            xmlStreamWriter.writeStartElement("rain"); // Write the start of the rain element to the document
+            
+            QXMLStreamAttribute dateAttribute("date", list.at(1));
+            xmlStreamWriter.writeAttribute(dateAttribute); // Write the date attribute to the document
+            
+            xmlStreamWriter.writeTextElement("station", list.at(0)); // Write the station element to the document
+            
+            xmlStreamWriter.writeTextElement("mm", list.at(2)); // Write the mm element to the documen
+            
+            xmlStreamWriter.writeEndElement(); // Write the end of the rain element to the document
+
+        // set up the <rain> tag and its sub-tags as required
+        }
+        
+        xmlStreamWriter.writeEndElement(); // Write the end of the rainRecord element to the document
+        
+        xmlStreamWriter.writeEndDocument(); // End the document
+    }
+    // end xml text
+    return xmlOutput;
+}
+```
+
+
 # October-November 2022
 ### Question 2.3:
 The following code stub is used to scan a list of files and collect the data returned from
