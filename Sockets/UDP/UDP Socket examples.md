@@ -1,5 +1,7 @@
 #### UDP socket receiver
 
+https://doc.qt.io/qt-6/qudpsocket.html
+
 NOTE: In order to use Sockets, you must add `find_package(Qt6 REQUIRED COMPONENTS Network)` to your CMAKE file:
 
 ```c++
@@ -28,6 +30,7 @@ find_package(Qt6 REQUIRED COMPONENTS Network)
 #include <QLabel>
 #include <QTextEdit>
 #include <QUdpSocket>
+#include <QThread>
 
 StoreManagementAppReceiver::StoreManagementAppReceiver() :
     receiverUILayout(new QFormLayout),
@@ -67,4 +70,49 @@ void StoreManagementAppReceiver::processBroadcastedMessage()
 ### Sleeping a thread:
 ```c++
 QThread::currentThread()->msleep(750);
+```
+
+### Another example
+```c++
+UDPSocketTest::UDPSocketTest()
+{
+
+}
+
+void UDPSocketTest::initSocket()
+{
+
+    udpSocket = new QUdpSocket(this);
+    udpSocket->connectToHost(QHostAddress::LocalHost, 2006);
+    udpSocket->bind(2006);
+
+
+    QString test = "testString";
+
+    QByteArray datagram = test.toUtf8();
+    udpSocket->writeDatagram(datagram, QHostAddress::LocalHost, 2006);
+    int i = 1;
+
+    while (i < 100) // Always run
+    {
+        udpSocket->writeDatagram(datagram, QHostAddress::LocalHost, 2006);
+        i++;
+
+        QThread::currentThread()->msleep(2000); // Sleep the thread for 2 seconds and then run again
+        readPendingDatagrams();
+    }
+
+}
+
+void UDPSocketTest::readPendingDatagrams()
+{
+    QByteArray datagram;
+    while (udpSocket->hasPendingDatagrams()) {
+        datagram.resize(int(udpSocket->pendingDatagramSize())); // Set the datagram size to be equal to the pending receiving datagram broadcast
+        udpSocket->readDatagram(datagram.data(), datagram.size());
+
+        qDebug() << datagram.constData();
+    }
+}
+
 ```
